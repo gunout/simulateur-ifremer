@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔬 Simulateur Polypes Coralliens — v6.0 · JSON · Comparaison · Exports</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bleu:#000091; --bleu-hi:#1212ff; --bleu-soft:#e3e3fd;
+  --rouge:#E1000F; --rouge-soft:#ffe9e9;
+  --or:#fbbf24; --or-hi:#f59e0b; --or-soft:rgba(251,191,36,.15);
+  --vert:#16a34a; --vert-soft:#dcfce7;
+  --blanc:#fff; --gris-50:#f6f6f6; --gris-100:#eee; --gris-200:#e5e5e5;
+  --gris-500:#929292; --gris-700:#3a3a3a; --gris-900:#1e1e1e;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --bg:#f6f6f6; --panel:#fff; --border:#e5e5e5; --text:#1e1e1e; --muted:#929292;
+}
+[data-theme="dark"]{
+  --blanc:#1a1d24; --gris-50:#12141a; --gris-100:#1e2129; --gris-200:#2a2e38;
+  --gris-500:#7a8090; --gris-700:#b8bcc6; --gris-900:#f0f2f5;
+  --bleu-soft:#1e1e4d; --rouge-soft:#3a1a1e; --vert-soft:#1a3a24; --or-soft:rgba(251,191,36,.1);
+  --bg:#12141a; --panel:#1a1d24; --border:#2a2e38; --text:#f0f2f5; --muted:#7a8090;
+  --bleu:#7a9bff; --bleu-hi:#a5bbff;
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--gris-100)}
+::-webkit-scrollbar-thumb{background:var(--gris-500);border-radius:4px}
+
+.tricolore{height:6px;background:linear-gradient(to right,#000091 0 33.33%,#fff 33.33% 66.66%,#E1000F 66.66% 100%)}
+.header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+.marianne{width:38px;height:38px;border-radius:50%;background:#000091;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #E1000F;flex-shrink:0}
+.header-txt strong{display:block;color:var(--bleu);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.header-txt span{font-size:11px;color:var(--gris-700)}
+.header-devise{margin-left:auto;font-size:9px;color:var(--gris-500);text-transform:uppercase;letter-spacing:1.2px;text-align:right}
+
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:10px 16px;gap:12px;position:sticky;top:6px;z-index:100;flex-wrap:wrap}
+.brand{font-size:14px;font-weight:800;color:var(--bleu);display:flex;align-items:center;gap:8px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--vert);box-shadow:0 0 0 3px rgba(22,163,74,.2);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.topbar-right{margin-left:auto;display:flex;gap:12px;font-family:var(--mono);font-size:11px;align-items:center;flex-wrap:wrap}
+.stat{display:flex;gap:5px;color:var(--gris-700);align-items:center;white-space:nowrap}
+.stat .val{color:var(--bleu);font-weight:700;padding:2px 6px;border-radius:3px;background:var(--bleu-soft)}
+.stat .val.vert{color:var(--vert);background:var(--vert-soft)}
+.stat .val.or{color:#8a5e00;background:var(--or-soft)}
+.stat .val.rouge{color:var(--rouge);background:var(--rouge-soft)}
+.theme-toggle{background:var(--panel);border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-toggle:hover{background:var(--bleu-soft);border-color:var(--bleu);transform:scale(1.05)}
+.burger-menu{display:none;background:var(--panel);border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:16px;align-items:center;justify-content:center}
+
+.app{display:grid;grid-template-columns:320px 1fr 310px;height:calc(100vh - 130px);overflow:hidden}
+.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.sb-head{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gris-50);flex-shrink:0}
+.sb-title{font-size:12px;font-weight:700;color:var(--bleu);letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sb-title::before{content:'';width:4px;height:14px;background:var(--or)}
+.sb-count{font-family:var(--mono);font-size:11px;color:var(--gris-500);margin-top:6px}
+.sb-list{flex:1;overflow-y:auto;padding:8px;min-height:0}
+
+.section-title{font-size:10px;font-weight:700;color:var(--gris-500);text-transform:uppercase;letter-spacing:.8px;padding:10px 8px 4px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:'';width:3px;height:10px;background:var(--bleu)}
+
+.control-group{margin-bottom:14px;padding:0 8px}
+.control-group label{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px;color:var(--gris-700);font-weight:600}
+.value-badge{background:var(--bleu-soft);padding:2px 8px;border-radius:3px;font-size:10px;color:var(--bleu);font-family:var(--mono);font-weight:700;border:1px solid var(--bleu-soft)}
+
+input[type=range]{width:100%;-webkit-appearance:none;background:transparent;height:6px;border-radius:6px;background:var(--gris-200);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--bleu);border:2px solid #fff;cursor:pointer;box-shadow:0 0 0 2px var(--bleu-soft);transition:all .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 0 0 4px var(--bleu-soft)}
+
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.radio-group label{background:var(--gris-50);padding:6px 12px;border-radius:4px;border:1px solid var(--border);cursor:pointer;font-size:11px;display:flex;align-items:center;gap:5px;color:var(--gris-700);transition:all .15s;font-weight:500}
+.radio-group label:has(input:checked){background:var(--bleu-soft);border-color:var(--bleu);color:var(--bleu);font-weight:700}
+.radio-group input{margin:0;accent-color:var(--bleu)}
+
+.sector-selector{display:flex;flex-wrap:wrap;gap:5px}
+.sector-btn{background:var(--gris-50);border:1px solid var(--border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;color:var(--gris-700);transition:all .15s;font-family:var(--sans);font-weight:500}
+.sector-btn:hover{border-color:var(--bleu);color:var(--bleu)}
+.sector-btn.active{background:var(--bleu);border-color:var(--bleu);color:#fff;font-weight:700}
+
+.btn{background:var(--bleu);color:#fff;border:1px solid var(--bleu);font-size:13px;font-weight:700;padding:11px 20px;border-radius:4px;cursor:pointer;transition:all .15s;font-family:var(--sans);white-space:nowrap}
+.btn:hover{background:var(--bleu-hi);border-color:var(--bleu-hi)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.secondary{background:var(--panel);color:var(--text);border-color:var(--border)}
+.btn.secondary:hover{border-color:var(--bleu);color:var(--bleu);background:var(--bleu-soft)}
+.btn.danger{background:var(--rouge);border-color:var(--rouge)}
+.btn.danger:hover{background:#c0000d}
+.btn.full{width:100%;margin-top:8px;font-size:14px;padding:13px}
+.btn.small{font-size:11px;padding:6px 12px}
+
+.drop-zone{border:2px dashed var(--border);border-radius:6px;padding:16px;text-align:center;background:var(--gris-50);transition:all .2s;cursor:pointer;margin:8px}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--bleu);background:var(--bleu-soft)}
+.drop-zone .icon{font-size:28px;margin-bottom:6px}
+.drop-zone .title{font-weight:700;color:var(--bleu);margin-bottom:4px;font-size:12px}
+.drop-zone .sub{font-size:10px;color:var(--gris-500)}
+
+.center{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+
+.mode-tabs{display:flex;gap:0;padding:0 10px;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0;overflow-x:auto}
+.mode-tab{background:transparent;border:none;color:var(--gris-700);font-size:12px;font-weight:500;padding:12px 14px;cursor:pointer;transition:all .15s;border-bottom:3px solid transparent;font-family:var(--sans);white-space:nowrap}
+.mode-tab:hover{background:var(--gris-50);color:var(--bleu)}
+.mode-tab.active{color:var(--bleu);border-bottom-color:var(--bleu);font-weight:700}
+.mode-tab .badge{background:var(--or);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px;font-family:var(--mono)}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:14px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0}
+.kpi{background:var(--gris-50);border:1px solid var(--border);border-left:4px solid var(--bleu);border-radius:4px;padding:10px 12px;transition:all .15s}
+.kpi:hover{border-color:var(--bleu);background:var(--bleu-soft);transform:translateY(-2px)}
+.kpi .label{font-size:9px;font-weight:700;color:var(--gris-500);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.kpi .value{font-size:18px;font-weight:800;color:var(--bleu);font-family:var(--mono);line-height:1.1;word-break:break-all}
+.kpi .sub{font-size:9px;color:var(--gris-500);margin-top:3px;font-family:var(--mono)}
+.kpi.vert{border-left-color:var(--vert)}.kpi.vert .value{color:var(--vert)}
+.kpi.or{border-left-color:var(--or)}.kpi.or .value{color:#8a5e00}
+.kpi.rouge{border-left-color:var(--rouge)}.kpi.rouge .value{color:var(--rouge)}
+
+.results{flex:1;overflow-y:auto;padding:14px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--bleu);border-radius:4px;padding:14px 16px;margin-bottom:10px;transition:all .15s;animation:fadeInUp .35s ease-out}
+.card:hover{border-color:var(--bleu);box-shadow:0 4px 12px rgba(0,0,145,.08)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card h3{font-size:14px;color:var(--bleu);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h4{font-size:12px;color:var(--bleu);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.card p{font-size:12px;color:var(--gris-700);margin-bottom:6px}
+.card .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+.tag{background:var(--gris-50);padding:3px 8px;border-radius:3px;border:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--gris-700);white-space:nowrap}
+.tag.bleu{background:var(--bleu-soft);color:var(--bleu);border-color:var(--bleu-soft)}
+.tag.vert{background:var(--vert-soft);color:var(--vert);border-color:var(--vert-soft)}
+.tag.rouge{background:var(--rouge-soft);color:var(--rouge);border-color:var(--rouge-soft)}
+.tag.or{background:var(--or-soft);color:#8a5e00;border-color:var(--or-soft)}
+
+.bar-row{display:grid;grid-template-columns:150px 1fr 70px;align-items:center;gap:8px;margin-bottom:8px;font-size:11px}
+.bar-row .name{color:var(--gris-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-weight:600}
+.bar-track{background:var(--gris-100);border-radius:3px;height:16px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--bleu) 0%,var(--bleu-hi) 100%);border-radius:3px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-fill.vert{background:linear-gradient(90deg,var(--vert) 0%,#22c55e 100%)}
+.bar-fill.or{background:linear-gradient(90deg,#8a5e00 0%,var(--or) 100%)}
+.bar-fill.rouge{background:linear-gradient(90deg,var(--rouge) 0%,#ff4444 100%)}
+.bar-row .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--bleu);font-weight:700;font-family:var(--mono)}
+
+.chart-wrap{background:var(--gris-50);border-radius:4px;padding:12px;border:1px solid var(--border);margin-top:8px}
+.chart-title{font-size:11px;color:var(--gris-500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+canvas{width:100%;height:220px;display:block}
+
+.right{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.rs-head{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gris-50);font-size:12px;font-weight:700;color:var(--bleu);letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.rs-head::before{content:'';width:4px;height:14px;background:var(--or)}
+.rs-body{flex:1;overflow-y:auto;padding:12px;min-height:0}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden}
+.panel-head{padding:9px 12px;background:var(--gris-50);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--bleu);letter-spacing:.5px;text-transform:uppercase}
+.panel-body{padding:10px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--gris-100);font-size:12px}
+.row:last-child{border-bottom:none}
+.row .k{color:var(--gris-700)}
+.row .v{color:var(--text);font-weight:700;font-family:var(--mono);font-size:11px;text-align:right;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .v.bleu{color:var(--bleu)}.row .v.vert{color:var(--vert)}.row .v.rouge{color:var(--rouge)}.row .v.or{color:#8a5e00}
+
+.proc-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--gris-100);font-size:12px;align-items:flex-start}
+.proc-step:last-child{border-bottom:none}
+.proc-num{background:var(--bleu);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;font-family:var(--mono)}
+.proc-num.rouge{background:var(--rouge)}
+.proc-num.vert{background:var(--vert)}
+.proc-txt{flex:1;color:var(--gris-700)}
+
+.hourly-table-wrap{max-height:320px;overflow-y:auto;margin-top:8px;border-radius:4px;border:1px solid var(--border);background:var(--panel)}
+.hourly-table{width:100%;border-collapse:collapse;font-size:11px}
+.hourly-table th{position:sticky;top:0;background:var(--bleu);color:#fff;padding:8px 6px;font-weight:700;text-align:left;z-index:2;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.hourly-table td{padding:4px 6px;border-bottom:1px solid var(--gris-100)}
+.hourly-table input{width:100%;background:var(--gris-50);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:3px;font-family:var(--mono);font-size:11px}
+.hourly-table input:focus{outline:none;border-color:var(--bleu);background:var(--bleu-soft);box-shadow:0 0 0 2px var(--bleu-soft)}
+.hourly-table tr:hover{background:var(--bleu-soft)}
+.hour-badge{display:inline-block;background:var(--bleu-soft);padding:2px 6px;border-radius:3px;font-size:10px;color:var(--bleu);font-family:var(--mono);font-weight:700}
+.day-badge{display:inline-block;background:var(--vert-soft);padding:2px 6px;border-radius:3px;font-size:10px;color:var(--vert);font-family:var(--mono);font-weight:700;margin-left:3px}
+
+/* Comparaison */
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.sim-card{background:var(--gris-50);border:1px solid var(--border);border-left:4px solid var(--bleu);border-radius:4px;padding:12px;transition:all .15s;position:relative}
+.sim-card:hover{box-shadow:0 4px 12px rgba(0,0,145,.1)}
+.sim-card.best{border-left-color:var(--vert);background:var(--vert-soft)}
+.sim-card.worst{border-left-color:var(--rouge);background:var(--rouge-soft)}
+.sim-card .sim-name{font-weight:700;color:var(--bleu);font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.sim-card.best .sim-name{color:var(--vert)}
+.sim-card.worst .sim-name{color:var(--rouge)}
+.sim-card .sim-metric{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dotted var(--gris-200)}
+.sim-card .sim-metric:last-child{border-bottom:none}
+.sim-card .sim-metric .k{color:var(--gris-700)}
+.sim-card .sim-metric .v{font-family:var(--mono);font-weight:700;color:var(--bleu)}
+.sim-card .sim-actions{display:flex;gap:4px;margin-top:8px}
+.sim-card .sim-actions button{flex:1;font-size:10px;padding:4px 8px;border-radius:3px;border:1px solid var(--border);background:var(--panel);cursor:pointer;font-family:var(--sans);color:var(--gris-700)}
+.sim-card .sim-actions button:hover{border-color:var(--bleu);color:var(--bleu)}
+.sim-card .sim-actions button.del{background:var(--rouge-soft);border-color:var(--rouge);color:var(--rouge)}
+.sim-card .sim-actions button.del:hover{background:var(--rouge);color:#fff}
+
+.compare-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
+.compare-table th,.compare-table td{padding:8px 10px;border:1px solid var(--border);text-align:left}
+.compare-table th{background:var(--bleu);color:#fff;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.compare-table tr:nth-child(even) td{background:var(--gris-50)}
+.compare-table td.best{background:var(--vert-soft);font-weight:700;color:var(--vert)}
+.compare-table td.worst{background:var(--rouge-soft);font-weight:700;color:var(--rouge)}
+
+.export-group{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--panel);flex-wrap:wrap}
+.export-btn{flex:1;min-width:100px;background:var(--panel);color:var(--text);border:1px solid var(--border);font-size:12px;font-weight:600;padding:10px 14px;border-radius:4px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.export-btn:hover:not(:disabled){border-color:var(--bleu);color:var(--bleu);background:var(--bleu-soft)}
+.export-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gris-900);color:#fff;padding:12px 20px;border-radius:6px;font-size:13px;font-weight:600;z-index:1000;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:slideInRight .3s ease-out;max-width:400px}
+.toast.success{background:var(--vert)}
+.toast.error{background:var(--rouge)}
+.toast.info{background:var(--bleu)}
+@keyframes slideInRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.log-panel{background:var(--gris-50);border-radius:4px;padding:10px;border:1px solid var(--border);max-height:150px;overflow-y:auto;font-family:var(--mono);font-size:10px;color:var(--gris-700);margin-top:8px}
+.log-line{padding:2px 0;border-bottom:1px dotted var(--gris-200)}
+.log-line.err{color:var(--rouge)}
+.log-line.ok{color:var(--vert)}
+.log-line.info{color:var(--bleu)}
+
+.preset-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.preset-btn{background:var(--gris-50);border:1px solid var(--border);color:var(--gris-700);padding:5px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--sans);font-weight:600;transition:all .15s}
+.preset-btn:hover{background:var(--bleu-soft);border-color:var(--bleu);color:var(--bleu)}
+.preset-btn.danger{background:var(--rouge-soft);border-color:var(--rouge);color:var(--rouge)}
+.preset-btn.danger:hover{background:var(--rouge);color:#fff}
+
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200}
+.mobile-overlay.visible{display:block}
+
+@media(max-width:900px){
+  .app{display:flex;flex-direction:column;height:auto}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:85vw;z-index:300;transform:translateX(-100%);transition:transform .3s ease-out;box-shadow:8px 0 24px rgba(0,0,0,.15)}
+  .sidebar.open{transform:translateX(0)}
+  .right{width:100%;border-left:none;border-top:1px solid var(--border)}
+  .results{max-height:70vh}
+  .burger-menu{display:flex}
+  .toast{bottom:12px;right:12px;left:12px;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<div class="tricolore"></div>
+
+<div class="header">
+  <button class="burger-menu" id="burgerMenu" title="Menu">☰</button>
+  <div class="marianne">RF</div>
+  <div class="header-txt">
+    <strong>IFREMER · HYSCORES · Spectrhabent-OI</strong>
+    <span>Simulateur de croissance des polypes coralliens — JSON externe · Comparaison · Exports</span>
+  </div>
+  <div class="header-devise"><em>Liberté</em><br><em>Égalité</em><br><em>Fraternité</em></div>
+</div>
+
+<div class="topbar">
+  <div class="brand"><span class="dot" id="statusDot"></span>SIMULATEUR POLYPES EXPERT <span style="color:var(--muted);font-weight:400;font-size:12px">/ v6.0</span></div>
+  <div class="topbar-right">
+    <div class="stat"><span>SECTEUR</span><span class="val or" id="tbSector">SAINT-GILLES</span></div>
+    <div class="stat"><span>SECTEURS</span><span class="val" id="tbSectors">4</span></div>
+    <div class="stat"><span>SIMULATIONS</span><span class="val or" id="tbSims">0</span></div>
+    <div class="stat"><span>SOURCE</span><span class="val vert" id="tbSource">INTÉGRÉ</span></div>
+    <button class="theme-toggle" id="themeToggle" title="Thème">🌙</button>
+  </div>
+</div>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-title">⚙️ Paramètres d'élevage</div>
+      <div class="sb-count" id="sbCount">4 secteurs intégrés</div>
+    </div>
+    <div class="sb-list">
+
+      <div class="section-title">Données</div>
+      <div class="drop-zone" id="dropZone">
+        <div class="icon">📁</div>
+        <div class="title">Glissez-déposez un JSON</div>
+        <div class="sub">ou cliquez pour choisir</div>
+        <input type="file" id="fileInput" accept=".json" style="display:none">
+      </div>
+      <div style="padding:0 8px 8px">
+        <button class="preset-btn danger" id="btnResetSectors" style="width:100%;padding:6px">↺ Restaurer secteurs intégrés</button>
+      </div>
+
+      <div class="section-title">Nutrition</div>
+
+      <div class="control-group">
+        <label>Fréquence de nourrissage <span class="value-badge" id="feedingValue">2.0 / sem</span></label>
+        <input type="range" id="feeding" min="0" max="7" step="0.5" value="2">
+      </div>
+
+      <div class="control-group">
+        <label>Qualité nutritionnelle <span class="value-badge" id="nutritionValue">Riche</span></label>
+        <div class="radio-group" id="nutritionGroup">
+          <label><input type="radio" name="nutrition" value="0"> Standard</label>
+          <label><input type="radio" name="nutrition" value="1" checked> Riche</label>
+          <label><input type="radio" name="nutrition" value="2"> Très riche</label>
+        </div>
+      </div>
+
+      <div class="section-title">Chimie de l'eau</div>
+
+      <div class="control-group">
+        <label>Alcalinité (carbonates) <span class="value-badge" id="alkValue">+0%</span></label>
+        <input type="range" id="alkalinity" min="0" max="100" step="5" value="0">
+      </div>
+
+      <div class="control-group">
+        <label>Température moyenne <span class="value-badge" id="tempValue">26.0 °C</span></label>
+        <input type="range" id="temp" min="22" max="32" step="0.5" value="26">
+      </div>
+
+      <div class="control-group">
+        <label>pH moyen <span class="value-badge" id="phValue">8.10</span></label>
+        <input type="range" id="ph" min="7.6" max="8.4" step="0.02" value="8.1">
+      </div>
+
+      <div class="section-title">Environnement</div>
+
+      <div class="control-group">
+        <label>Intensité lumineuse <span class="value-badge" id="lightValue">Moyenne</span></label>
+        <input type="range" id="light" min="0" max="100" step="1" value="50">
+      </div>
+
+      <div class="control-group">
+        <label>Brouteurs (contrôle algues) <span class="value-badge" id="grazerValue">Moyen</span></label>
+        <input type="range" id="grazer" min="0" max="100" step="5" value="50">
+      </div>
+
+      <div class="control-group">
+        <label>Sédimentation <span class="value-badge" id="sedValue">Faible</span></label>
+        <input type="range" id="sediment" min="0" max="100" step="5" value="20">
+      </div>
+
+      <div class="section-title">Secteur récifal</div>
+
+      <div class="control-group">
+        <div class="sector-selector" id="sectorSelector"></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:var(--mono)" id="sectorInfo"></div>
+      </div>
+
+      <button class="btn full" id="simulateBtn">▶ LANCER LA SIMULATION</button>
+      <button class="btn full secondary" id="saveSimBtn" style="margin-top:6px">💾 Sauvegarder pour comparaison</button>
+
+    </div>
+  </aside>
+
+  <main class="center">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-view="overview">📊 Vue d'ensemble</button>
+      <button class="mode-tab" data-view="charts">📈 Graphiques</button>
+      <button class="mode-tab" data-view="compare">⚖️ Comparer <span class="badge" id="compareBadge" style="display:none">0</span></button>
+      <button class="mode-tab" data-view="hourly">⏱ Saisie horaire</button>
+      <button class="mode-tab" data-view="events">📅 Événements</button>
+      <button class="mode-tab" data-view="indicators">📐 Indicateurs</button>
+      <button class="mode-tab" data-view="warnings">⚠️ Avertissements</button>
+    </div>
+
+    <div class="kpi-strip" id="kpiStrip"></div>
+
+    <div class="results" id="resultsArea"></div>
+
+    <div class="export-group">
+      <button class="export-btn" id="exportCsv" disabled>📥 CSV</button>
+      <button class="export-btn" id="exportJson" disabled>📥 JSON</button>
+      <button class="export-btn" id="exportHtml" disabled>📥 Rapport HTML</button>
+      <button class="export-btn" id="exportCompare" disabled>⚖️ Comparaison</button>
+      <button class="export-btn" id="clearBtn">🗑️ Effacer</button>
+    </div>
+  </main>
+
+  <aside class="right">
+    <div class="rs-head">Intelligence Polypes</div>
+    <div class="rs-body">
+
+      <div class="panel">
+        <div class="panel-head">💚 ENVIRONNEMENT</div>
+        <div class="panel-body">
+          <div class="row"><span class="k">Source</span><span class="v bleu" id="ivSource">Intégré</span></div>
+          <div class="row"><span class="k">Projets</span><span class="v">HYSCORES · Spectrhabent-OI</span></div>
+          <div class="row"><span class="k">Portail</span><span class="v">data.gouv.fr 🇫🇷</span></div>
+          <div class="row"><span class="k">Secteurs</span><span class="v" id="ivSectors">4</span></div>
+          <div class="row"><span class="k">Statut</span><span class="v or" id="ivStatus">● PRÊT</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">📊 SYNTHÈSE SIMULATION</div>
+        <div class="panel-body">
+          <div class="row"><span class="k">Secteur</span><span class="v bleu" id="ivSector">Saint-Gilles</span></div>
+          <div class="row"><span class="k">Croissance</span><span class="v" id="ivGrowth">—</span></div>
+          <div class="row"><span class="k">VCH finale</span><span class="v" id="ivVCH">—</span></div>
+          <div class="row"><span class="k">Polypes</span><span class="v" id="ivPolyp">—</span></div>
+          <div class="row"><span class="k">Mortalité</span><span class="v" id="ivMort">—</span></div>
+          <div class="row"><span class="k">Zooxanthelles</span><span class="v" id="ivZoo">—</span></div>
+          <div class="row"><span class="k">Heures simulées</span><span class="v" id="ivHours">—</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">🏆 GAIN VS SCÉNARIO DE BASE</div>
+        <div class="panel-body">
+          <div class="row"><span class="k">Base</span><span class="v or">0.52 %/an</span></div>
+          <div class="row"><span class="k">Simulation</span><span class="v vert" id="ivSimGrowth">—</span></div>
+          <div class="row"><span class="k">Gain</span><span class="v vert" id="ivGain">—</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">💾 SIMULATIONS SAUVEGARDÉES</div>
+        <div class="panel-body" id="savedSimsList">
+          <div style="text-align:center;color:var(--muted);font-size:11px;padding:8px">Aucune simulation sauvegardée</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">⚠️ POINTS DE VIGILANCE</div>
+        <div class="panel-body">
+          <div class="row"><span class="k">Décote 2015</span><span class="v rouge">±15 pts VCH</span></div>
+          <div class="row"><span class="k">Géoréférencement</span><span class="v or">±10 %</span></div>
+          <div class="row"><span class="k">Seuils VCH</span><span class="v rouge">non publiés</span></div>
+          <div class="row"><span class="k">Licence</span><span class="v rouge">notspecified</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">📜 JOURNAL</div>
+        <div class="panel-body">
+          <div class="log-panel" id="logPanel">
+            <div class="log-line info">[init] Simulateur v6.0 prêt.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<script>
+/* =========================================================
+   SIMULATEUR POLYPES EXPERT v6.0
+   Chargement JSON · Comparaison · Exports
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => new Intl.NumberFormat('fr-FR').format(n || 0);
+
+/* =========================================================
+   SECTEURS PAR DÉFAUT (intégrés)
+   ========================================================= */
+const DEFAULT_SECTORS = {
+  'saint-gilles': { nom:'Saint-Gilles', vch_2015:56.6, surface_recifale_km2:2.76, corail_pct:1.57, corail_surface_km2:1.521, pixels_corail:9504836 },
+  'saint-leu':    { nom:'Saint-Leu',    vch_2015:56.6, surface_recifale_km2:0.67, corail_pct:2.93, corail_surface_km2:0.442, pixels_corail:2764663 },
+  'etang-sale':   { nom:'Étang-Salé',   vch_2015:56.6, surface_recifale_km2:0.24, corail_pct:2.34, corail_surface_km2:0.073, pixels_corail:459275 },
+  'saint-pierre': { nom:'Saint-Pierre', vch_2015:56.6, surface_recifale_km2:0.41, corail_pct:1.68, corail_surface_km2:0.132, pixels_corail:822616 }
+};
+
+const K_CALCIF_BASE = 0.52;
+const POLYPES_PAR_M2 = 1e4;
+const TOTAL_HOURS = 24 * 30 * 24;
+
+/* =========================================================
+   ÉTAT GLOBAL
+   ========================================================= */
+const state = {
+  sectors: JSON.parse(JSON.stringify(DEFAULT_SECTORS)),
+  currentSector: 'saint-gilles',
+  sectorSource: 'Intégré',
+  hourlyData: new Map(),
+  events: [],
+  lastResult: null,
+  savedSimulations: [],
+  theme: localStorage.getItem('polypes-theme') || 'light',
+  activeView: 'overview'
+};
+
+/* =========================================================
+   THÈME
+   ========================================================= */
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', state.theme);
+  const b = $('themeToggle'); if (b) b.textContent = state.theme === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme(){
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('polypes-theme', state.theme);
+  applyTheme();
+  if (state.lastResult) renderView();
+}
+
+/* =========================================================
+   CHARGEMENT JSON
+   ========================================================= */
+function setupDropZone(){
+  const dz = $('dropZone'), fi = $('fileInput');
+  if (!dz || !fi) return;
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+}
+
+function handleFile(file){
+  if (!file.name.endsWith('.json')){ toast('❌ Format attendu : .json', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      loadExternalJSON(data, file.name);
+    } catch(err){
+      toast('❌ JSON invalide : ' + err.message, 'error', 5000);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function loadExternalJSON(data, filename){
+  const imported = {};
+
+  // Format 1 : reunion_974_analyses_completes.json (avec classifications)
+  if (data.analyses && data.analyses.classifications){
+    data.analyses.classifications.forEach(c => {
+      const key = slugify(c.nom);
+      imported[key] = {
+        nom: c.nom,
+        vch_2015: data.analyses.synthese?.vch_moyen_2015 || 56.6,
+        surface_recifale_km2: c.surface_recifale_km2,
+        corail_pct: c.corail_vivant?.pct || 0,
+        corail_surface_km2: c.corail_vivant?.surface_km2 || 0,
+        pixels_corail: c.corail_vivant?.pixels || 0
+      };
+    });
+    log(`JSON analysé : ${Object.keys(imported).length} secteurs extraits de classifications`, 'ok');
+  }
+  // Format 2 : { datasets: [...] } avec métadonnées
+  else if (data.datasets && Array.isArray(data.datasets)){
+    data.datasets.forEach(d => {
+      if (d.nom && d.corail_surface_km2 !== undefined){
+        imported[slugify(d.nom)] = {
+          nom: d.nom,
+          vch_2015: d.vch_2015 || 56.6,
+          surface_recifale_km2: d.surface_recifale_km2 || 0,
+          corail_pct: d.corail_pct || 0,
+          corail_surface_km2: d.corail_surface_km2 || 0,
+          pixels_corail: d.pixels_corail || 0
+        };
+      }
+    });
+    log(`JSON analysé : ${Object.keys(imported).length} secteurs extraits de datasets`, 'ok');
+  }
+  // Format 3 : objet de secteurs { "saint-gilles": {...}, ... }
+  else if (typeof data === 'object' && !Array.isArray(data)){
+    Object.entries(data).forEach(([key, val]) => {
+      if (val && val.corail_surface_km2 !== undefined && val.nom){
+        imported[slugify(key)] = {
+          nom: val.nom,
+          vch_2015: val.vch_2015 || 56.6,
+          surface_recifale_km2: val.surface_recifale_km2 || 0,
+          corail_pct: val.corail_pct || 0,
+          corail_surface_km2: val.corail_surface_km2 || 0,
+          pixels_corail: val.pixels_corail || 0
+        };
+      }
+    });
+    log(`JSON analysé : ${Object.keys(imported).length} secteurs extraits de l'objet`, 'ok');
+  }
+
+  if (Object.keys(imported).length === 0){
+    toast('❌ Aucun secteur reconnu dans ce JSON', 'error', 5000);
+    log('Aucun secteur reconnu. Formats supportés : classifications, datasets, objet de secteurs.', 'err');
+    return;
+  }
+
+  // Fusion : les secteurs importés écrasent les secteurs intégrés de même clé
+  Object.assign(state.sectors, imported);
+  state.sectorSource = filename;
+
+  // Sélectionner le premier secteur importé
+  const firstKey = Object.keys(imported)[0];
+  state.currentSector = firstKey;
+
+  renderSectorButtons();
+  updateSectorInfo();
+  updateStats();
+
+  $('tbSource').textContent = filename.length > 15 ? filename.slice(0, 13) + '…' : filename;
+  $('tbSource').className = 'val vert';
+  $('ivSource').textContent = filename.length > 20 ? filename.slice(0, 18) + '…' : filename;
+  $('ivSectors').textContent = Object.keys(state.sectors).length;
+  $('sbCount').textContent = `${Object.keys(state.sectors).length} secteurs · source : ${filename}`;
+
+  toast(`✅ ${Object.keys(imported).length} secteur(s) importé(s) depuis ${filename}`, 'success', 4000);
+  log(`Secteurs fusionnés : total ${Object.keys(state.sectors).length}`, 'ok');
+}
+
+function slugify(s){
+  return String(s).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function resetSectors(){
+  state.sectors = JSON.parse(JSON.stringify(DEFAULT_SECTORS));
+  state.currentSector = 'saint-gilles';
+  state.sectorSource = 'Intégré';
+  renderSectorButtons();
+  updateSectorInfo();
+  updateStats();
+  $('tbSource').textContent = 'INTÉGRÉ';
+  $('tbSource').className = 'val vert';
+  $('ivSource').textContent = 'Intégré';
+  $('ivSectors').textContent = '4';
+  $('sbCount').textContent = '4 secteurs intégrés';
+  toast('↺ Secteurs intégrés restaurés', 'info');
+  log('Secteurs intégrés restaurés.', 'info');
+}
+
+/* =========================================================
+   MOTEUR PHYSIOLOGIQUE
+   ========================================================= */
+function computeHourlyPhysiology(hour, env){
+  const { temp, ph, par, feed, alk } = env;
+  let photoLight;
+  if (par <= 5) photoLight = 0.05;
+  else photoLight = Math.max(0.05, Math.exp(-Math.pow((par - 65) / 28, 2)));
+  const tempOpt = 26.5;
+  let photoTemp;
+  if (temp <= tempOpt) photoTemp = 0.7 + 0.3 * (temp / tempOpt);
+  else photoTemp = Math.max(0.15, 1 - 0.18 * (temp - tempOpt));
+  const phFactor = Math.max(0.4, 1 - Math.abs(ph - 8.15) * 2.5);
+  const photoFactor = photoLight * photoTemp * phFactor;
+
+  const alkFactor = 1 + (alk / 100) * 1.1;
+  const calcPh = ph < 7.9 ? Math.max(0.2, (ph - 7.4) / 0.5) : 1;
+  const calcTemp = temp < 28 ? 0.8 + 0.2 * (temp - 22) / 6 : Math.max(0.4, 1 - 0.1 * (temp - 28));
+  const calcFactor = alkFactor * calcPh * calcTemp;
+
+  let feedFactor;
+  if (feed <= 0) feedFactor = 0.85;
+  else if (feed < 0.5) feedFactor = 1.0;
+  else if (feed < 1.5) feedFactor = 1.2;
+  else if (feed < 2.5) feedFactor = 1.35;
+  else feedFactor = 1.25;
+
+  const thermalMort = temp > 30 ? (temp - 30) * 0.25 : 0;
+  const mortality = Math.min(0.5, thermalMort);
+  const zooRatio = Math.max(0.2, Math.min(1.3, photoFactor * (1 - thermalMort * 0.5)));
+  const grossGrowth = K_CALCIF_BASE * photoFactor * calcFactor * feedFactor;
+  const netGrowth = grossGrowth * (1 - mortality);
+
+  return { photoFactor, calcFactor, feedFactor, mortality, zooRatio, netGrowth, grossGrowth, thermalMort };
+}
+
+function buildHourlyProfile(params){
+  const profile = [];
+  const hourlyMap = state.hourlyData;
+  const { temp:baseTemp, ph:basePh, alkalinity:baseAlk, light:baseLight, feeding:feedingFreq } = params;
+  const feedingsPerWeek = feedingFreq;
+  const hoursBetweenFeeding = feedingsPerWeek > 0 ? (7 * 24) / feedingsPerWeek : Infinity;
+
+  for (let h = 0; h < TOTAL_HOURS; h++){
+    const hourOfDay = h % 24;
+    let dayPar;
+    if (hourOfDay < 6 || hourOfDay >= 20) dayPar = 0;
+    else dayPar = Math.sin(((hourOfDay - 6) / 14) * Math.PI) * 100;
+    let par = dayPar * (baseLight / 100);
+    const tempCycle = Math.sin(((hourOfDay - 6) / 24) * 2 * Math.PI) * 0.8;
+    let temp = baseTemp + tempCycle;
+    const phCycle = Math.sin(((hourOfDay - 6) / 24) * 2 * Math.PI) * 0.05;
+    let ph = basePh + phCycle;
+    let alk = baseAlk;
+    let feed = 0;
+    if (feedingsPerWeek > 0 && h % Math.round(hoursBetweenFeeding) === 0) feed = 1.0;
+
+    let customPar = null;
+    if (hourlyMap.has(h)){
+      const custom = hourlyMap.get(h);
+      if (custom.temp !== undefined && custom.temp !== '') temp = parseFloat(custom.temp);
+      if (custom.ph !== undefined && custom.ph !== '') ph = parseFloat(custom.ph);
+      if (custom.par !== undefined && custom.par !== '') customPar = parseFloat(custom.par);
+      if (custom.feed !== undefined && custom.feed !== '') feed = parseFloat(custom.feed);
+      if (custom.alk !== undefined && custom.alk !== '') alk = parseFloat(custom.alk);
+    }
+
+    for (const ev of state.events){
+      if (h >= ev.start && h < ev.start + ev.duration){
+        const intensity = ev.intensity / 100;
+        switch (ev.type){
+          case 'feeding': feed = Math.max(feed, intensity * 2); break;
+          case 'heat': temp += intensity * 6; break;
+          case 'fresh': ph = Math.min(8.4, ph + intensity * 0.15); break;
+          case 'alk': alk = Math.min(100, alk + intensity * 50); break;
+        }
+      }
+    }
+    profile.push({ hour:h, hourOfDay, temp, ph, par: customPar !== null ? customPar : par, feed, alk });
+  }
+  return profile;
+}
+
+function simulateHourly(sectorKey, params){
+  const sector = state.sectors[sectorKey];
+  if (!sector){ toast('❌ Secteur introuvable', 'error'); return null; }
+  const profile = buildHourlyProfile(params);
+  let vch = sector.vch_2015;
+  let surface = sector.corail_surface_km2;
+  let polyps = surface * 1e6 * POLYPES_PAR_M2 * (params.density / 1.0);
+  const initialPolyps = polyps;
+  let baseVCH = sector.vch_2015;
+  let baseSurface = sector.corail_surface_km2;
+  const baseDeclinePerHour = -0.087 / (24 * 365);
+  const dailySamples = [];
+  const last72 = [];
+  let totalMortality = 0, totalZoo = 0, count = 0;
+  let eventsApplied = 0;
+  const appliedEvents = new Set();
+  let sumPhoto = 0, sumCalc = 0, sumNut = 0;
+
+  for (let i = 0; i < profile.length; i++){
+    const env = profile[i];
+    const phys = computeHourlyPhysiology(env.hour, env);
+    const sedMort = (params.sediment / 100) * 0.001;
+    const algaeComp = (1 - params.grazer / 100) * 0.0008;
+    const totalMort = phys.mortality / 24 + sedMort + algaeComp;
+    const growthRatePerHour = phys.netGrowth / (24 * 365);
+    surface = surface * (1 + growthRatePerHour / 100);
+    vch = Math.min(100, Math.max(0, vch + (phys.netGrowth - K_CALCIF_BASE) * 0.0001 * phys.zooRatio));
+    polyps = polyps * (1 + growthRatePerHour / 100) * (1 - totalMort);
+    baseVCH += baseDeclinePerHour * 0.01;
+    baseSurface = baseSurface * (1 + baseDeclinePerHour / 100);
+    totalMortality += totalMort;
+    totalZoo += phys.zooRatio;
+    sumPhoto += phys.photoFactor;
+    sumCalc += phys.calcFactor;
+    sumNut += phys.feedFactor;
+    count++;
+    for (let e = 0; e < state.events.length; e++){
+      const ev = state.events[e];
+      if (i >= ev.start && i < ev.start + ev.duration && !appliedEvents.has(e)){ appliedEvents.add(e); eventsApplied++; }
+    }
+    if (i % 24 === 0) dailySamples.push({ month: (i/24)/30, day: i/24, vch, baseVCH, surface, baseSurface, polyps });
+    if (i >= profile.length - 72) last72.push({ hour:i, temp:env.temp, par:env.par, feed:env.feed, ph:env.ph, alk:env.alk });
+  }
+
+  const monthlyBase = [], monthlySim = [];
+  for (let m = 0; m <= 24; m++){
+    const idx = Math.min(dailySamples.length - 1, Math.floor((m / 24) * dailySamples.length));
+    const s = dailySamples[idx];
+    if (s){ monthlyBase.push({ month:m, vch:s.baseVCH }); monthlySim.push({ month:m, vch:s.vch }); }
+  }
+
+  return {
+    id: 'sim_' + Date.now(),
+    date: new Date().toISOString(),
+    sectorKey, sectorName: sector.nom, sector,
+    params: { ...params },
+    final: {
+      simVCH:vch, baseVCH, simSurface:surface, baseSurface, simPolyps:polyps, initialPolyps,
+      avgMortality:(totalMortality/count)*100, avgZoo:totalZoo/count,
+      avgPhoto:sumPhoto/count, avgCalc:sumCalc/count, avgNut:sumNut/count,
+      hoursSimulated:profile.length, eventsApplied, customHoursCount:state.hourlyData.size
+    },
+    monthlyBase, monthlySim, last72
+  };
+}
+
+/* =========================================================
+   GRAPHIQUES
+   ========================================================= */
+function drawVCHChart(canvas, baseTraj, simTraj, extraTrajs = []){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const m = { top:15, right:15, bottom:25, left:42 };
+  const plotW = W - m.left - m.right;
+  const plotH = H - m.top - m.bottom;
+  const allVch = [...baseTraj.map(p => p.vch), ...simTraj.map(p => p.vch)];
+  extraTrajs.forEach(t => allVch.push(...t.map(p => p.vch)));
+  const vchMin = Math.min(...allVch) - 1;
+  const vchMax = Math.max(...allVch) + 1;
+  const xScale = mo => m.left + (mo / 24) * plotW;
+  const yScale = v => m.top + plotH - ((v - vchMin) / (vchMax - vchMin)) * plotH;
+
+  ctx.strokeStyle = '#e5e5e5'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++){
+    const y = m.top + (i / 4) * plotH;
+    ctx.beginPath(); ctx.moveTo(m.left, y); ctx.lineTo(W - m.right, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#929292'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+  for (let mo = 0; mo <= 24; mo += 4) ctx.fillText(mo + 'm', xScale(mo), H - 8);
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++){
+    const v = vchMin + (i / 4) * (vchMax - vchMin);
+    ctx.fillText(v.toFixed(1), m.left - 5, yScale(v) + 3);
+  }
+
+  ctx.strokeStyle = '#929292'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  baseTraj.forEach((p, i) => { const x = xScale(p.month), y = yScale(p.vch); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke(); ctx.setLineDash([]);
+
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#1212ff'); grad.addColorStop(1, '#000091');
+  ctx.strokeStyle = grad; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  simTraj.forEach((p, i) => { const x = xScale(p.month), y = yScale(p.vch); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke();
+
+  const colors = ['#E1000F', '#fbbf24', '#16a34a', '#9333ea'];
+  extraTrajs.forEach((traj, idx) => {
+    ctx.strokeStyle = colors[idx % colors.length]; ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
+    ctx.beginPath();
+    traj.forEach((p, i) => { const x = xScale(p.month), y = yScale(p.vch); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+}
+
+function drawHourlyChart(canvas, data){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  if (!data || data.length === 0) return;
+  const m = { top:10, right:10, bottom:20, left:35 };
+  const plotW = W - m.left - m.right;
+  const plotH = H - m.top - m.bottom;
+  const n = data.length;
+  const xScale = i => m.left + (i / (n - 1)) * plotW;
+  const yTemp = t => m.top + plotH - ((t - 22) / 10) * plotH;
+  const yPar = p => m.top + plotH - (p / 100) * plotH;
+  const yFeed = f => m.top + plotH - (Math.min(f, 2) / 2) * plotH;
+
+  ctx.strokeStyle = '#e5e5e5'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 3; i++){
+    const y = m.top + (i / 3) * plotH;
+    ctx.beginPath(); ctx.moveTo(m.left, y); ctx.lineTo(W - m.right, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#929292'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
+  for (let i = 0; i < n; i += Math.max(1, Math.floor(n / 6))) ctx.fillText(data[i].hour, xScale(i), H - 5);
+
+  ctx.strokeStyle = '#E1000F'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  data.forEach((d, i) => { const x = xScale(i), y = yTemp(d.temp); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke();
+
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  data.forEach((d, i) => { const x = xScale(i), y = yPar(d.par); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(0,0,145,0.4)';
+  data.forEach((d, i) => {
+    if (d.feed > 0){ const x = xScale(i); const y = yFeed(d.feed); ctx.fillRect(x - 2, y, 4, m.top + plotH - y); }
+  });
+
+  ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#E1000F'; ctx.fillText('Temp', W - 130, 12);
+  ctx.fillStyle = '#fbbf24'; ctx.fillText('PAR', W - 90, 12);
+  ctx.fillStyle = '#000091'; ctx.fillText('Nourr.', W - 50, 12);
+}
+
+/* =========================================================
+   UI : LABELS
+   ========================================================= */
+const inputs = {
+  feeding:$('feeding'), alkalinity:$('alkalinity'), light:$('light'),
+  temp:$('temp'), ph:$('ph'), grazer:$('grazer'), sediment:$('sediment')
+};
+const nutritionRadios = document.querySelectorAll('input[name="nutrition"]');
+
+function getParams(){
+  let nutrition = 1;
+  nutritionRadios.forEach(r => { if (r.checked) nutrition = parseInt(r.value); });
+  return {
+    feeding: parseFloat(inputs.feeding.value),
+    nutrition,
+    alkalinity: parseInt(inputs.alkalinity.value),
+    light: parseInt(inputs.light.value),
+    temp: parseFloat(inputs.temp.value),
+    ph: parseFloat(inputs.ph.value),
+    grazer: parseInt(inputs.grazer.value),
+    sediment: parseInt(inputs.sediment.value),
+    density: 1.0
+  };
+}
+
+function updateLabels(){
+  $('feedingValue').textContent = parseFloat(inputs.feeding.value).toFixed(1) + ' / sem';
+  $('alkValue').textContent = '+' + inputs.alkalinity.value + '%';
+  const light = parseInt(inputs.light.value);
+  $('lightValue').textContent = light < 30 ? 'Faible' : light < 60 ? 'Moyenne' : light < 85 ? 'Forte' : 'Très forte';
+  $('tempValue').textContent = parseFloat(inputs.temp.value).toFixed(1) + ' °C';
+  $('phValue').textContent = parseFloat(inputs.ph.value).toFixed(2);
+  const g = parseInt(inputs.grazer.value);
+  $('grazerValue').textContent = g < 30 ? 'Faible' : g < 70 ? 'Moyen' : 'Élevé';
+  const s = parseInt(inputs.sediment.value);
+  $('sedValue').textContent = s < 30 ? 'Faible' : s < 70 ? 'Modéré' : 'Élevé';
+  let nutVal = 0;
+  nutritionRadios.forEach(r => { if (r.checked) nutVal = parseInt(r.value); });
+  $('nutritionValue').textContent = ['Standard','Riche','Très riche'][nutVal];
+}
+
+function renderSectorButtons(){
+  const c = $('sectorSelector');
+  if (!c) return;
+  const keys = Object.keys(state.sectors);
+  c.innerHTML = keys.map(k => {
+    const s = state.sectors[k];
+    const active = k === state.currentSector ? 'active' : '';
+    return `<button class="sector-btn ${active}" data-sector="${k}">${escapeHtml(s.nom)}</button>`;
+  }).join('');
+  c.querySelectorAll('.sector-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.currentSector = btn.dataset.sector;
+      renderSectorButtons();
+      updateSectorInfo();
+      log(`Secteur : ${state.sectors[state.currentSector].nom}`, 'info');
+    });
+  });
+}
+
+function updateSectorInfo(){
+  const s = state.sectors[state.currentSector];
+  if (!s) return;
+  $('sectorInfo').textContent = `Corail : ${s.corail_pct} % · surface récifale : ${s.surface_recifale_km2} km²`;
+  $('ivSector').textContent = s.nom;
+  $('tbSector').textContent = s.nom.toUpperCase();
+}
+
+function updateStats(){
+  $('tbSectors').textContent = Object.keys(state.sectors).length;
+  $('tbSims').textContent = state.savedSimulations.length;
+  $('ivSectors').textContent = Object.keys(state.sectors).length;
+}
+
+function log(msg, type = 'info'){
+  const panel = $('logPanel');
+  if (!panel) return;
+  const line = document.createElement('div');
+  line.className = 'log-line ' + type;
+  const t = new Date().toLocaleTimeString('fr-FR', { hour12:false });
+  line.textContent = `[${t}] ${msg}`;
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+  while (panel.children.length > 40) panel.removeChild(panel.firstChild);
+}
+
+function toast(msg, type = 'info', duration = 3000){
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), duration);
+}
+
+/* =========================================================
+   KPI
+   ========================================================= */
+function renderKPIs(){
+  const strip = $('kpiStrip');
+  if (!strip) return;
+  if (!state.lastResult){
+    strip.innerHTML = `
+      <div class="kpi or"><div class="label">Statut</div><div class="value">PRÊT</div><div class="sub">lancez la simulation</div></div>
+      <div class="kpi"><div class="label">Secteurs</div><div class="value">${Object.keys(state.sectors).length}</div><div class="sub">disponibles</div></div>
+      <div class="kpi"><div class="label">Simulations</div><div class="value">${state.savedSimulations.length}</div><div class="sub">sauvegardées</div></div>
+      <div class="kpi"><div class="label">Pas horaires</div><div class="value">17 520</div><div class="sub">24 mois</div></div>
+    `;
+    return;
+  }
+  const f = state.lastResult.final;
+  const s = state.lastResult.sector;
+  const netGrowth = (f.simSurface / s.corail_surface_km2 - 1) * 100 / 2;
+  const gainPct = ((netGrowth - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+
+  strip.innerHTML = `
+    <div class="kpi ${netGrowth > 0.6 ? 'vert' : netGrowth > 0.3 ? 'or' : 'rouge'}">
+      <div class="label">Croissance</div><div class="value">${netGrowth.toFixed(2)}</div><div class="sub">%/an</div>
+    </div>
+    <div class="kpi ${f.simVCH > 60 ? 'vert' : f.simVCH > 50 ? 'or' : 'rouge'}">
+      <div class="label">VCH finale</div><div class="value">${f.simVCH.toFixed(1)}</div><div class="sub">24 mois</div>
+    </div>
+    <div class="kpi vert">
+      <div class="label">Polypes</div><div class="value">${(f.simPolyps/1e6).toFixed(1)}</div><div class="sub">millions</div>
+    </div>
+    <div class="kpi ${f.avgMortality > 2 ? 'rouge' : f.avgMortality > 1 ? 'or' : 'vert'}">
+      <div class="label">Mortalité</div><div class="value">${f.avgMortality.toFixed(2)}</div><div class="sub">%/h</div>
+    </div>
+    <div class="kpi ${gainPct > 20 ? 'vert' : gainPct > 0 ? 'or' : 'rouge'}">
+      <div class="label">Gain vs base</div><div class="value">${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}</div><div class="sub">%</div>
+    </div>
+    <div class="kpi"><div class="label">Sauvegardes</div><div class="value">${state.savedSimulations.length}</div><div class="sub">simulations</div></div>
+  `;
+}
+
+/* =========================================================
+   RENDER VUES
+   ========================================================= */
+function renderView(){
+  renderKPIs();
+  const area = $('resultsArea');
+  if (!area) return;
+  if (!state.lastResult && !['compare','indicators','warnings'].includes(state.activeView)){
+    area.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--muted)">
+        <div style="font-size:48px;margin-bottom:16px">🇫🇷</div>
+        <div style="font-weight:700;color:var(--text);margin-bottom:8px;font-size:16px">Simulateur Polypes Expert v6.0</div>
+        <div>Réglez les paramètres et cliquez sur <strong>▶ LANCER LA SIMULATION</strong>.</div>
+        <div style="margin-top:20px;font-size:12px">💡 Chargez un JSON externe via la barre latérale pour ajouter des secteurs</div>
+      </div>`;
+    return;
+  }
+  switch(state.activeView){
+    case 'overview': return renderOverview(area);
+    case 'charts': return renderCharts(area);
+    case 'compare': return renderCompare(area);
+    case 'hourly': return renderHourly(area);
+    case 'events': return renderEvents(area);
+    case 'indicators': return renderIndicators(area);
+    case 'warnings': return renderWarnings(area);
+  }
+}
+
+function renderOverview(area){
+  const r = state.lastResult;
+  if (!r) return;
+  const f = r.final;
+  const s = r.sector;
+  const netGrowth = (f.simSurface / s.corail_surface_km2 - 1) * 100 / 2;
+  const deltaSurf = f.simSurface - s.corail_surface_km2;
+  const gainPct = ((netGrowth - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+
+  area.innerHTML = `
+    <div class="card">
+      <h3>📊 Synthèse — ${escapeHtml(s.nom)}</h3>
+      <p>Simulation horaire sur ${fmt(f.hoursSimulated)} pas de temps (24 mois).</p>
+      <div class="meta">
+        <span class="tag bleu">${escapeHtml(s.nom)}</span>
+        <span class="tag">VCH 2015 : ${s.vch_2015}%</span>
+        <span class="tag">Surface récifale : ${s.surface_recifale_km2} km²</span>
+        <span class="tag vert">Corail initial : ${s.corail_surface_km2} km²</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📈 Croissance et vitalité</h3>
+      <div class="bar-row"><div class="name">Croissance nette</div><div class="bar-track"><div class="bar-fill ${netGrowth > 0.6 ? 'vert' : netGrowth > 0.3 ? 'or' : 'rouge'}" style="width:${Math.min(100, (netGrowth / 2) * 100)}%"></div></div><div class="val">${netGrowth.toFixed(2)}%</div></div>
+      <div class="bar-row"><div class="name">VCH finale</div><div class="bar-track"><div class="bar-fill ${f.simVCH > 60 ? 'vert' : f.simVCH > 50 ? 'or' : 'rouge'}" style="width:${f.simVCH}%"></div></div><div class="val">${f.simVCH.toFixed(1)}</div></div>
+      <div class="bar-row"><div class="name">Mortalité</div><div class="bar-track"><div class="bar-fill rouge" style="width:${Math.min(100, f.avgMortality * 20)}%"></div></div><div class="val">${f.avgMortality.toFixed(2)}%/h</div></div>
+      <div class="bar-row"><div class="name">Ratio zoo.</div><div class="bar-track"><div class="bar-fill vert" style="width:${(f.avgZoo / 1.3) * 100}%"></div></div><div class="val">${f.avgZoo.toFixed(2)}</div></div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Bilan</h3>
+      <div class="row"><span class="k">Surface initiale</span><span class="v bleu">${s.corail_surface_km2} km²</span></div>
+      <div class="row"><span class="k">Surface finale</span><span class="v vert">${f.simSurface.toFixed(4)} km²</span></div>
+      <div class="row"><span class="k">Δ surface</span><span class="v ${deltaSurf >= 0 ? 'vert' : 'rouge'}">${deltaSurf >= 0 ? '+' : ''}${deltaSurf.toFixed(4)} km²</span></div>
+      <div class="row"><span class="k">Polypes initiaux</span><span class="v">${(f.initialPolyps/1e6).toFixed(1)} M</span></div>
+      <div class="row"><span class="k">Polypes finaux</span><span class="v vert">${(f.simPolyps/1e6).toFixed(1)} M</span></div>
+      <div class="row"><span class="k">Gain vs base</span><span class="v ${gainPct >= 0 ? 'vert' : 'rouge'}">${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)} %</span></div>
+    </div>
+  `;
+}
+
+function renderCharts(area){
+  const r = state.lastResult;
+  if (!r) return;
+  const extraTrajs = state.savedSimulations.map(s => s.monthlySim);
+  area.innerHTML = `
+    <div class="card">
+      <h3>📈 Trajectoire VCH · 24 mois</h3>
+      <p style="font-size:11px;color:var(--muted)">${extraTrajs.length > 0 ? `+ ${extraTrajs.length} simulation(s) sauvegardée(s) en pointillés colorés` : 'Sauvegardez des simulations pour les comparer sur ce graphique'}</p>
+      <div class="chart-wrap">
+        <canvas id="vchChart" width="900" height="240"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>⏱ Profil horaire · dernières 72 h</h3>
+      <div class="chart-wrap">
+        <canvas id="hourlyChart" width="900" height="160"></canvas>
+      </div>
+    </div>
+  `;
+  requestAnimationFrame(() => {
+    drawVCHChart($('vchChart'), r.monthlyBase, r.monthlySim, extraTrajs);
+    drawHourlyChart($('hourlyChart'), r.last72);
+  });
+}
+
+/* ============ COMPARAISON ============ */
+function renderCompare(area){
+  if (!state.lastResult && state.savedSimulations.length === 0){
+    area.innerHTML = `
+      <div class="card">
+        <h3>⚖️ Comparaison de simulations</h3>
+        <p>Lancez une simulation puis cliquez sur <strong>💾 Sauvegarder pour comparaison</strong> pour ajouter des scénarios.</p>
+        <p style="color:var(--muted);font-size:11px;margin-top:8px">Vous pourrez comparer jusqu'à 6 simulations côte à côte.</p>
+      </div>`;
+    return;
+  }
+  const all = [];
+  if (state.lastResult) all.push({ ...state.lastResult, isCurrent:true });
+  state.savedSimulations.forEach(s => all.push({ ...s, isCurrent:false }));
+
+  // Calcul des métriques
+  const metrics = all.map(sim => {
+    const f = sim.final;
+    const s = sim.sector;
+    const netGrowth = (f.simSurface / s.corail_surface_km2 - 1) * 100 / 2;
+    const gainPct = ((netGrowth - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+    return { sim, netGrowth, gainPct, f, s };
+  });
+
+  // Meilleurs / pires
+  const bestGrowth = Math.max(...metrics.map(m => m.netGrowth));
+  const worstGrowth = Math.min(...metrics.map(m => m.netGrowth));
+  const bestVCH = Math.max(...metrics.map(m => m.f.simVCH));
+  const worstVCH = Math.min(...metrics.map(m => m.f.simVCH));
+  const bestMort = Math.min(...metrics.map(m => m.f.avgMortality));
+  const worstMort = Math.max(...metrics.map(m => m.f.avgMortality));
+
+  area.innerHTML = `
+    <div class="card">
+      <h3>⚖️ Comparaison de ${metrics.length} simulation(s)</h3>
+      <p>Scénarios côte à côte · meilleur en vert · pire en rouge</p>
+    </div>
+
+    <div class="compare-grid">
+      ${metrics.map(m => {
+        const isBestGrowth = m.netGrowth === bestGrowth;
+        const isWorstGrowth = m.netGrowth === worstGrowth && metrics.length > 1;
+        const cls = isBestGrowth ? 'best' : isWorstGrowth ? 'worst' : '';
+        return `
+        <div class="sim-card ${cls}">
+          <div class="sim-name">
+            <span>${m.isCurrent ? '🟢 ' : ''}${escapeHtml(m.s.nom)}</span>
+            <span class="tag ${isBestGrowth ? 'vert' : isWorstGrowth ? 'rouge' : 'bleu'}">${isBestGrowth ? '🏆' : isWorstGrowth ? '⚠️' : ''}</span>
+          </div>
+          <div class="sim-metric"><span class="k">Croissance</span><span class="v">${m.netGrowth.toFixed(2)} %/an</span></div>
+          <div class="sim-metric"><span class="k">VCH finale</span><span class="v">${m.f.simVCH.toFixed(1)}</span></div>
+          <div class="sim-metric"><span class="k">Polypes</span><span class="v">${(m.f.simPolyps/1e6).toFixed(1)} M</span></div>
+          <div class="sim-metric"><span class="k">Mortalité</span><span class="v">${m.f.avgMortality.toFixed(2)} %/h</span></div>
+          <div class="sim-metric"><span class="k">Gain</span><span class="v">${m.gainPct >= 0 ? '+' : ''}${m.gainPct.toFixed(1)} %</span></div>
+          <div class="sim-metric"><span class="k">Nourrissage</span><span class="v">${m.sim.params.feeding}/sem</span></div>
+          <div class="sim-metric"><span class="k">Alcalinité</span><span class="v">+${m.sim.params.alkalinity}%</span></div>
+          <div class="sim-metric"><span class="k">Température</span><span class="v">${m.sim.params.temp}°C</span></div>
+          <div class="sim-actions">
+            ${!m.isCurrent ? `<button class="del" data-del="${m.sim.id}">🗑 Supprimer</button>` : '<span style="font-size:10px;color:var(--muted);padding:4px">Simulation active</span>'}
+          </div>
+        </div>
+      `}).join('')}
+    </div>
+
+    <div class="card">
+      <h3>📊 Tableau comparatif détaillé</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Indicateur</th>
+            ${metrics.map(m => `<th>${escapeHtml(m.s.nom)}${m.isCurrent ? ' (actif)' : ''}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Croissance (%/an)</td>${metrics.map(m => `<td class="${m.netGrowth === bestGrowth ? 'best' : m.netGrowth === worstGrowth && metrics.length > 1 ? 'worst' : ''}">${m.netGrowth.toFixed(2)}</td>`).join('')}</tr>
+          <tr><td>VCH finale</td>${metrics.map(m => `<td class="${m.f.simVCH === bestVCH ? 'best' : m.f.simVCH === worstVCH && metrics.length > 1 ? 'worst' : ''}">${m.f.simVCH.toFixed(1)}</td>`).join('')}</tr>
+          <tr><td>Mortalité (%/h)</td>${metrics.map(m => `<td class="${m.f.avgMortality === bestMort ? 'best' : m.f.avgMortality === worstMort && metrics.length > 1 ? 'worst' : ''}">${m.f.avgMortality.toFixed(2)}</td>`).join('')}</tr>
+          <tr><td>Ratio zooxanthelles</td>${metrics.map(m => `<td>${m.f.avgZoo.toFixed(2)}</td>`).join('')}</tr>
+          <tr><td>Polypes (M)</td>${metrics.map(m => `<td>${(m.f.simPolyps/1e6).toFixed(1)}</td>`).join('')}</tr>
+          <tr><td>Surface finale (km²)</td>${metrics.map(m => `<td>${m.f.simSurface.toFixed(4)}</td>`).join('')}</tr>
+          <tr><td>Gain vs base (%)</td>${metrics.map(m => `<td class="${m.gainPct > 0 ? 'best' : 'worst'}">${m.gainPct >= 0 ? '+' : ''}${m.gainPct.toFixed(1)}</td>`).join('')}</tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  area.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.del;
+      state.savedSimulations = state.savedSimulations.filter(s => s.id !== id);
+      updateStats();
+      renderSavedSimsList();
+      renderCompare(area);
+      toast('🗑 Simulation supprimée', 'info');
+    });
+  });
+}
+
+function renderHourly(area){
+  area.innerHTML = `
+    <div class="card">
+      <h3>⏱ Saisie horaire personnalisée</h3>
+      <p>Complétez heure par heure. Les valeurs vides utilisent les paramètres généraux.</p>
+      <div class="preset-row">
+        <button class="preset-btn" data-preset="normal">Journée normale</button>
+        <button class="preset-btn" data-preset="heat">Stress thermique</button>
+        <button class="preset-btn" data-preset="feed">Nourrissage intensif</button>
+        <button class="preset-btn" data-preset="night">Cycle nuit</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn secondary small" id="btnLoadDay">📅 Charger 24 h</button>
+        <button class="btn secondary small" id="btnLoadWeek">📆 Charger 1 semaine</button>
+        <button class="btn secondary small" id="btnAddDay">+ Ajouter 1 jour</button>
+        <button class="btn danger small" id="btnClearHourly">🗑 Effacer</button>
+      </div>
+      <div class="hourly-table-wrap">
+        <table class="hourly-table" id="hourlyTable">
+          <thead><tr><th>Heure</th><th>Temp °C</th><th>pH</th><th>PAR</th><th>Nourr.</th><th>Alk %</th></tr></thead>
+          <tbody id="hourlyBody"></tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;font-family:var(--mono)" id="hourlyStats">0 heure(s) saisie(s)</div>
+    </div>
+  `;
+  renderHourlyTable();
+  $('btnLoadDay')?.addEventListener('click', () => loadDayPreset('normal'));
+  $('btnLoadWeek')?.addEventListener('click', loadWeekPreset);
+  $('btnAddDay')?.addEventListener('click', () => {
+    const maxKey = state.hourlyData.size > 0 ? Math.max(...state.hourlyData.keys()) : -1;
+    for (let i = 1; i <= 24; i++) state.hourlyData.set(maxKey + i, {});
+    renderHourlyTable();
+  });
+  $('btnClearHourly')?.addEventListener('click', () => { state.hourlyData.clear(); renderHourlyTable(); });
+  document.querySelectorAll('.preset-btn[data-preset]').forEach(btn => btn.addEventListener('click', () => loadDayPreset(btn.dataset.preset)));
+}
+
+function renderHourlyTable(){
+  const tbody = $('hourlyBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (state.hourlyData.size === 0){ for (let h = 0; h < 24; h++) addHourlyRow(h, {}); }
+  else { Array.from(state.hourlyData.keys()).sort((a,b) => a-b).forEach(h => addHourlyRow(h, state.hourlyData.get(h))); }
+  updateHourlyStats();
+}
+
+function addHourlyRow(hour, data){
+  const tbody = $('hourlyBody');
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.dataset.hour = hour;
+  const hourOfDay = hour % 24;
+  const day = Math.floor(hour / 24) + 1;
+  tr.innerHTML = `
+    <td><span class="hour-badge">${String(hourOfDay).padStart(2,'0')}:00</span><span class="day-badge">J${day}</span></td>
+    <td><input type="number" step="0.1" data-field="temp" value="${data.temp ?? ''}" placeholder="—"></td>
+    <td><input type="number" step="0.01" data-field="ph" value="${data.ph ?? ''}" placeholder="—"></td>
+    <td><input type="number" step="1" min="0" max="100" data-field="par" value="${data.par ?? ''}" placeholder="—"></td>
+    <td><input type="number" step="0.1" min="0" max="3" data-field="feed" value="${data.feed ?? ''}" placeholder="—"></td>
+    <td><input type="number" step="1" min="0" max="100" data-field="alk" value="${data.alk ?? ''}" placeholder="—"></td>
+  `;
+  tr.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const field = inp.dataset.field, val = inp.value;
+      if (!state.hourlyData.has(hour)) state.hourlyData.set(hour, {});
+      const obj = state.hourlyData.get(hour);
+      if (val === '') delete obj[field]; else obj[field] = val;
+      updateHourlyStats();
+    });
+  });
+  tbody.appendChild(tr);
+}
+
+function updateHourlyStats(){
+  let filled = 0;
+  state.hourlyData.forEach(obj => { if (Object.keys(obj).length > 0) filled++; });
+  const el = $('hourlyStats');
+  if (el) el.textContent = `${filled} heure(s) avec au moins une valeur — les paramètres généraux complètent le reste.`;
+}
+
+function loadDayPreset(preset){
+  state.hourlyData.clear();
+  for (let h = 0; h < 24; h++){
+    let temp = 26, ph = 8.1, par = 0, feed = 0, alk = 0;
+    if (h >= 6 && h < 20) par = Math.round(Math.sin(((h - 6) / 14) * Math.PI) * 100);
+    temp = 26 + Math.sin(((h - 6) / 24) * 2 * Math.PI) * 0.8;
+    ph = 8.1 + Math.sin(((h - 6) / 24) * 2 * Math.PI) * 0.05;
+    switch(preset){
+      case 'heat': if (h >= 12 && h < 16) temp += 5; break;
+      case 'feed': if (h === 8 || h === 14 || h === 20) feed = 1; break;
+      case 'night': if (h < 6) { temp -= 1; par = 0; } break;
+    }
+    state.hourlyData.set(h, { temp:temp.toFixed(1), ph:ph.toFixed(2), par:String(par), feed:String(feed), alk:String(alk) });
+  }
+  renderHourlyTable();
+  log(`Preset "${preset}" chargé (24 h).`, 'ok');
+}
+
+function loadWeekPreset(){
+  state.hourlyData.clear();
+  for (let h = 0; h < 168; h++){
+    const hod = h % 24;
+    let par = 0, feed = 0;
+    if (hod >= 6 && hod < 20) par = Math.round(Math.sin(((hod - 6) / 14) * Math.PI) * 100);
+    if (hod === 8 || hod === 20) feed = 1;
+    state.hourlyData.set(h, {
+      temp:(26 + Math.sin(((hod - 6) / 24) * 2 * Math.PI) * 0.8).toFixed(1),
+      ph:(8.1 + Math.sin(((hod - 6) / 24) * 2 * Math.PI) * 0.05).toFixed(2),
+      par:String(par), feed:String(feed), alk:'0'
+    });
+  }
+  renderHourlyTable();
+  log('Semaine type chargée (168 h).', 'ok');
+}
+
+function renderEvents(area){
+  area.innerHTML = `
+    <div class="card">
+      <h3>📅 Planification d'événements</h3>
+      <p>Les événements se superposent aux paramètres et saisies horaires.</p>
+      <div class="control-group">
+        <label>Type d'événement</label>
+        <div class="radio-group">
+          <label><input type="radio" name="eventType" value="feeding" checked> 🦐 Nourrissage</label>
+          <label><input type="radio" name="eventType" value="heat"> 🌡 Stress thermique</label>
+          <label><input type="radio" name="eventType" value="fresh"> 💧 Renouvellement</label>
+          <label><input type="radio" name="eventType" value="alk"> 🧪 Boost alcalinité</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Heure de début <span class="value-badge" id="eventStartValue">0</span></label>
+        <input type="range" id="eventStart" min="0" max="17520" step="1" value="0">
+      </div>
+      <div class="control-group">
+        <label>Durée (heures) <span class="value-badge" id="eventDurValue">1</span></label>
+        <input type="range" id="eventDur" min="1" max="168" step="1" value="1">
+      </div>
+      <div class="control-group">
+        <label>Intensité (0-100) <span class="value-badge" id="eventIntValue">50</span></label>
+        <input type="range" id="eventInt" min="0" max="100" step="5" value="50">
+      </div>
+      <button class="btn full" id="btnAddEvent">+ Ajouter l'événement</button>
+      <div id="eventList" style="margin-top:12px"></div>
+    </div>
+  `;
+  const es = $('eventStart'), ed = $('eventDur'), ei = $('eventInt');
+  es?.addEventListener('input', () => $('eventStartValue').textContent = es.value);
+  ed?.addEventListener('input', () => $('eventDurValue').textContent = ed.value);
+  ei?.addEventListener('input', () => $('eventIntValue').textContent = ei.value);
+  $('btnAddEvent')?.addEventListener('click', () => {
+    let type = 'feeding';
+    document.querySelectorAll('input[name="eventType"]').forEach(r => { if (r.checked) type = r.value; });
+    state.events.push({ type, start:parseInt(es.value), duration:parseInt(ed.value), intensity:parseInt(ei.value) });
+    renderEventList();
+    log(`Événement ajouté : ${type} · h${es.value}–${parseInt(es.value) + parseInt(ed.value)}`, 'ok');
+  });
+  renderEventList();
+}
+
+function renderEventList(){
+  const c = $('eventList');
+  if (!c) return;
+  if (state.events.length === 0){
+    c.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">Aucun événement planifié.</div>';
+    return;
+  }
+  c.innerHTML = state.events.map((ev, i) => {
+    const label = { feeding:'🦐 Nourrissage', heat:'🌡 Chaleur', fresh:'💧 Renouvellement', alk:'🧪 Alcalinité' }[ev.type] || ev.type;
+    return `<div class="row"><span class="k">${label} · h${ev.start}–${ev.start + ev.duration} · ${ev.intensity}%</span><button class="preset-btn danger" data-idx="${i}">✕</button></div>`;
+  }).join('');
+  c.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.events.splice(parseInt(btn.dataset.idx), 1);
+      renderEventList();
+    });
+  });
+}
+
+function renderIndicators(area){
+  const IND = [
+    {id:'vch', nom:'VCH', full:'Vitalité Corallienne Hyperspectrale', formule:'corail vivant / (corail + algues)', masque:'Substrat dur', unite:'0-100 %', classes:['mauvais','médiocre','moyen','bon','très bon'], seuils:[0,20,40,60,80,100]},
+    {id:'taux', nom:'Taux de croissance', full:'Croissance nette annuelle', formule:'K_base × photo × calc × nutrition × (1 − mortalité)', masque:'Polypes + zooxanthelles', unite:'%/an', classes:['très faible','faible','moyen','bon','excellent'], seuils:[0,0.3,0.5,0.7,1.0,2.0]},
+    {id:'zoo', nom:'Ratio zooxanthelles', full:'Densité symbiotique', formule:'photo × (1 − stress thermique)', masque:'Tissu corallien', unite:'0-1.3', classes:['dégradé','faible','moyen','optimal'], seuils:[0,0.4,0.7,1.0,1.3]},
+    {id:'mort', nom:'Mortalité', full:'Taux de mortalité horaire', formule:'thermique + sédimentation + algues + suralimentation', masque:'Tous polypes', unite:'%/h', classes:['négligeable','faible','modérée','élevée'], seuils:[0,0.5,1.0,2.0,5.0]},
+    {id:'polyps', nom:'Polypes', full:'Densité de polypes', formule:'surface × 10 000 polypes/m²', masque:'Surface corallienne', unite:'ind./m²', classes:['très faible','faible','moyen','bon','excellent'], seuils:[0,5000,10000,15000,20000]},
+    {id:'surf', nom:'Surface corallienne', full:'Surface de corail vivant', formule:'surface_initiale × (1 + croissance)^années', masque:'Secteur récifal', unite:'km²', classes:['très faible','faible','moyen','bon','excellent'], seuils:[0,0.1,0.5,1.0,2.0]}
+  ];
+  area.innerHTML = IND.map(ind => `
+    <div class="card">
+      <h3>📐 ${escapeHtml(ind.nom)} — ${escapeHtml(ind.full)}</h3>
+      <div class="meta"><span class="tag bleu">${escapeHtml(ind.unite)}</span><span class="tag">Masque : ${escapeHtml(ind.masque)}</span></div>
+      <h4>Formule</h4>
+      <p style="font-family:var(--mono);background:var(--gris-50);padding:8px;border-radius:3px;border-left:3px solid var(--bleu);font-size:11px"><strong>${escapeHtml(ind.nom)}</strong> = ${escapeHtml(ind.formule)}</p>
+      <h4>Classes</h4>
+      ${ind.classes.map((c, i) => `<div class="bar-row"><div class="name">${escapeHtml(c)}</div><div class="bar-track"><div class="bar-fill" style="width:${((i + 1) / ind.classes.length) * 100}%"></div></div><div class="val">${ind.seuils[i]}–${ind.seuils[i + 1]}</div></div>`).join('')}
+    </div>
+  `).join('');
+}
+
+function renderWarnings(area){
+  const warnings = [
+    {niveau:'rouge', titre:'Décote marégraphique 2015', desc:'Incertitude ±15 points VCH.'},
+    {niveau:'rouge', titre:'Seuils VCH non publiés', desc:'Repris du projet HYSCORES.'},
+    {niveau:'rouge', titre:'Licence notspecified', desc:'Usage juridique incertain.'},
+    {niveau:'or', titre:'Géoréférencement ±10 %', desc:'Faux positifs possibles.'},
+    {niveau:'or', titre:'Validation terrain 2015 absente', desc:'Uniquement 2009-2010.'}
+  ];
+  area.innerHTML = warnings.map(w => `
+    <div class="card" style="border-left-color:${w.niveau === 'rouge' ? 'var(--rouge)' : 'var(--or)'}">
+      <h3 style="color:${w.niveau === 'rouge' ? 'var(--rouge)' : '#8a5e00'}">${w.niveau === 'rouge' ? '🚫' : '⚠️'} ${escapeHtml(w.titre)}</h3>
+      <p>${escapeHtml(w.desc)}</p>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   SIMULATION
+   ========================================================= */
+function runSimulation(){
+  const params = getParams();
+  log(`Simulation · ${state.sectors[state.currentSector].nom} · ${TOTAL_HOURS} h`);
+  const t0 = performance.now();
+  const result = simulateHourly(state.currentSector, params);
+  const t1 = performance.now();
+  if (!result){ toast('❌ Erreur de simulation', 'error'); return; }
+  state.lastResult = result;
+  const f = result.final;
+  const s = result.sector;
+  const netGrowth = (f.simSurface / s.corail_surface_km2 - 1) * 100 / 2;
+  const gainPct = ((netGrowth - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+
+  $('ivGrowth').textContent = netGrowth.toFixed(2) + ' %/an';
+  $('ivVCH').textContent = f.simVCH.toFixed(1);
+  $('ivPolyp').textContent = (f.simPolyps/1e6).toFixed(1) + ' M';
+  $('ivMort').textContent = f.avgMortality.toFixed(2) + ' %/h';
+  $('ivZoo').textContent = f.avgZoo.toFixed(2);
+  $('ivHours').textContent = fmt(f.hoursSimulated);
+  $('ivSimGrowth').textContent = netGrowth.toFixed(2) + ' %/an';
+  $('ivGain').textContent = (gainPct >= 0 ? '+' : '') + gainPct.toFixed(1) + ' %';
+  $('ivStatus').textContent = '● SIMULÉ';
+
+  ['exportCsv','exportJson','exportHtml'].forEach(id => $(id).disabled = false);
+  if (state.savedSimulations.length > 0) $('exportCompare').disabled = false;
+
+  renderView();
+  log(`  → croissance = ${netGrowth.toFixed(2)} %/an · VCH = ${f.simVCH.toFixed(1)} · ${(t1-t0).toFixed(0)} ms`, 'ok');
+  toast(`✅ ${netGrowth.toFixed(2)} %/an · VCH ${f.simVCH.toFixed(1)}`, 'success');
+}
+
+function saveSimulation(){
+  if (!state.lastResult){ toast('❌ Lancez d\'abord une simulation', 'error'); return; }
+  if (state.savedSimulations.length >= 6){ toast('❌ Maximum 6 simulations sauvegardées', 'error'); return; }
+  state.savedSimulations.push(JSON.parse(JSON.stringify(state.lastResult)));
+  updateStats();
+  renderSavedSimsList();
+  $('exportCompare').disabled = false;
+  $('compareBadge').style.display = 'inline-block';
+  $('compareBadge').textContent = state.savedSimulations.length;
+  toast(`💾 Simulation sauvegardée (${state.savedSimulations.length})`, 'success');
+  log(`Simulation sauvegardée : ${state.lastResult.sectorName}`, 'ok');
+}
+
+function renderSavedSimsList(){
+  const c = $('savedSimsList');
+  if (!c) return;
+  if (state.savedSimulations.length === 0){
+    c.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;padding:8px">Aucune simulation sauvegardée</div>';
+    return;
+  }
+  c.innerHTML = state.savedSimulations.map(s => {
+    const netGrowth = (s.final.simSurface / s.sector.corail_surface_km2 - 1) * 100 / 2;
+    return `
+      <div class="row">
+        <span class="k">${escapeHtml(s.sectorName)}</span>
+        <span class="v vert">${netGrowth.toFixed(2)}%/an</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =========================================================
+   EXPORTS
+   ========================================================= */
+function exportJSON(){
+  if (!state.lastResult){ toast('❌ Lancez d\'abord une simulation', 'error'); return; }
+  const r = state.lastResult;
+  const f = r.final;
+  const netGrowth = (f.simSurface / r.sector.corail_surface_km2 - 1) * 100 / 2;
+  const data = {
+    metadata: { date:new Date().toISOString(), secteur:r.sectorName, source:state.sectorSource, version:'v6.0' },
+    parametres: r.params,
+    resultats: {
+      croissance_pct_an: netGrowth.toFixed(2),
+      vch_finale: f.simVCH.toFixed(1),
+      surface_initiale_km2: r.sector.corail_surface_km2,
+      surface_finale_km2: f.simSurface.toFixed(4),
+      polypes_finaux: f.simPolyps,
+      mortalite_pct_h: f.avgMortality.toFixed(2),
+      ratio_zooxanthelles: f.avgZoo.toFixed(2),
+      heures_simulees: f.hoursSimulated
+    },
+    simulations_sauvegardees: state.savedSimulations.length,
+    incertitudes: { decote_2015:'±15 pts VCH', georeferencement:'±10 %', seuils_vch:'non publiés' }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `simulation-polypes-${state.currentSector}-${Date.now()}.json`;
+  a.click();
+  toast('📥 JSON exporté', 'success');
+}
+
+function exportCSV(){
+  if (!state.lastResult){ toast('❌ Lancez d\'abord une simulation', 'error'); return; }
+  const r = state.lastResult;
+  const f = r.final;
+  const netGrowth = (f.simSurface / r.sector.corail_surface_km2 - 1) * 100 / 2;
+  const rows = [
+    ['Indicateur','Valeur','Unité'],
+    ['Secteur', r.sectorName, ''],
+    ['Croissance nette', netGrowth.toFixed(2), '%/an'],
+    ['VCH finale', f.simVCH.toFixed(1), '%'],
+    ['Surface initiale', r.sector.corail_surface_km2, 'km²'],
+    ['Surface finale', f.simSurface.toFixed(4), 'km²'],
+    ['Polypes initiaux', (f.initialPolyps/1e6).toFixed(1), 'M'],
+    ['Polypes finaux', (f.simPolyps/1e6).toFixed(1), 'M'],
+    ['Mortalité', f.avgMortality.toFixed(2), '%/h'],
+    ['Ratio zooxanthelles', f.avgZoo.toFixed(2), ''],
+    ['Heures simulées', f.hoursSimulated, ''],
+    ['Événements appliqués', f.eventsApplied, '']
+  ];
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `simulation-polypes-${state.currentSector}-${Date.now()}.csv`;
+  a.click();
+  toast('📥 CSV exporté', 'success');
+}
+
+function exportHTML(){
+  if (!state.lastResult){ toast('❌ Lancez d\'abord une simulation', 'error'); return; }
+  const r = state.lastResult;
+  const f = r.final;
+  const netGrowth = (f.simSurface / r.sector.corail_surface_km2 - 1) * 100 / 2;
+  const gainPct = ((netGrowth - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+  const p = r.params;
+
+  const html = `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<title>Simulation Polypes — ${escapeHtml(r.sectorName)}</title>
+<style>
+body{font-family:system-ui;max-width:1100px;margin:2em auto;padding:0 1em;line-height:1.6;color:#1e1e1e}
+h1{color:#000091;border-bottom:3px solid #E1000F;padding-bottom:.3em}
+h2{color:#000091;margin-top:2em;background:#e3e3fd;padding:.5em;border-left:4px solid #000091}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+th,td{border:1px solid #ddd;padding:.5em;text-align:left}
+th{background:#000091;color:#fff}
+tr:nth-child(even){background:#f6f6f6}
+.ok{background:#dcfce7;padding:1em;border-left:4px solid #16a34a;margin:1em 0}
+.danger{background:#ffe9e9;padding:1em;border-left:4px solid #E1000F;margin:1em 0}
+</style></head><body>
+<h1>🔬 Simulation Polypes — ${escapeHtml(r.sectorName)}</h1>
+<p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+<p><strong>Source :</strong> ${escapeHtml(state.sectorSource)}</p>
+
+<h2>📊 Synthèse</h2>
+<div class="ok">
+<strong>Croissance nette :</strong> ${netGrowth.toFixed(2)} %/an<br>
+<strong>VCH finale :</strong> ${f.simVCH.toFixed(1)} %<br>
+<strong>Gain vs base :</strong> ${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)} %
+</div>
+
+<h2>⚙️ Paramètres</h2>
+<table>
+<tr><th>Paramètre</th><th>Valeur</th></tr>
+<tr><td>Nourrissage</td><td>${p.feeding} /semaine</td></tr>
+<tr><td>Qualité nutritionnelle</td><td>${['Standard','Riche','Très riche'][p.nutrition]}</td></tr>
+<tr><td>Alcalinité</td><td>+${p.alkalinity} %</td></tr>
+<tr><td>Température</td><td>${p.temp} °C</td></tr>
+<tr><td>pH</td><td>${p.ph}</td></tr>
+<tr><td>Lumière</td><td>${p.light} / 100</td></tr>
+<tr><td>Brouteurs</td><td>${p.grazer} / 100</td></tr>
+<tr><td>Sédimentation</td><td>${p.sediment} / 100</td></tr>
+</table>
+
+<h2>📈 Résultats</h2>
+<table>
+<tr><th>Indicateur</th><th>Valeur</th><th>Unité</th></tr>
+<tr><td>Croissance nette</td><td><strong>${netGrowth.toFixed(2)}</strong></td><td>%/an</td></tr>
+<tr><td>VCH finale</td><td><strong>${f.simVCH.toFixed(1)}</strong></td><td>%</td></tr>
+<tr><td>Surface finale</td><td>${f.simSurface.toFixed(4)}</td><td>km²</td></tr>
+<tr><td>Polypes finaux</td><td>${(f.simPolyps/1e6).toFixed(1)}</td><td>M</td></tr>
+<tr><td>Mortalité</td><td>${f.avgMortality.toFixed(2)}</td><td>%/h</td></tr>
+<tr><td>Ratio zooxanthelles</td><td>${f.avgZoo.toFixed(2)}</td><td>—</td></tr>
+</table>
+
+${state.savedSimulations.length > 0 ? `
+<h2>⚖️ Comparaison (${state.savedSimulations.length + 1} simulations)</h2>
+<table>
+<tr><th>Simulation</th><th>Croissance</th><th>VCH finale</th><th>Polypes</th></tr>
+${[r, ...state.savedSimulations].map(sim => {
+  const ng = (sim.final.simSurface / sim.sector.corail_surface_km2 - 1) * 100 / 2;
+  return `<tr><td>${escapeHtml(sim.sectorName)}</td><td>${ng.toFixed(2)} %/an</td><td>${sim.final.simVCH.toFixed(1)}</td><td>${(sim.final.simPolyps/1e6).toFixed(1)} M</td></tr>`;
+}).join('')}
+</table>
+` : ''}
+
+<h2>⚠️ Incertitudes</h2>
+<div class="danger">
+<ul>
+<li>Décote marégraphique 2015 : ±15 points VCH</li>
+<li>Géoréférencement : ±10 %</li>
+<li>Seuils VCH : non publiés</li>
+</ul>
+</div>
+<hr>
+<p style="color:#929292;font-size:12px">Simulateur Polypes Expert v6.0 · IFREMER / HYSCORES</p>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `rapport-simulation-${state.currentSector}-${Date.now()}.html`;
+  a.click();
+  toast('📥 Rapport HTML exporté', 'success');
+}
+
+function exportComparison(){
+  const all = [];
+  if (state.lastResult) all.push(state.lastResult);
+  state.savedSimulations.forEach(s => all.push(s));
+  if (all.length < 2){ toast('❌ Sauvegardez au moins 2 simulations', 'error'); return; }
+
+  const rows = [['Secteur','Croissance %/an','VCH finale','Polypes (M)','Mortalité %/h','Gain %','Nourrissage /sem','Alcalinité %','Temp °C']];
+  all.forEach(sim => {
+    const f = sim.final;
+    const ng = (f.simSurface / sim.sector.corail_surface_km2 - 1) * 100 / 2;
+    const gain = ((ng - K_CALCIF_BASE) / K_CALCIF_BASE) * 100;
+    rows.push([
+      sim.sectorName,
+      ng.toFixed(2),
+      f.simVCH.toFixed(1),
+      (f.simPolyps/1e6).toFixed(1),
+      f.avgMortality.toFixed(2),
+      (gain >= 0 ? '+' : '') + gain.toFixed(1),
+      sim.params.feeding,
+      sim.params.alkalinity,
+      sim.params.temp
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `comparaison-simulations-${Date.now()}.csv`;
+  a.click();
+  toast('⚖️ Comparaison exportée', 'success');
+}
+
+/* =========================================================
+   ÉVÉNEMENTS UI
+   ========================================================= */
+Object.values(inputs).forEach(el => el?.addEventListener('input', updateLabels));
+nutritionRadios.forEach(r => r.addEventListener('change', updateLabels));
+
+document.querySelectorAll('.mode-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    state.activeView = t.dataset.view;
+    renderView();
+  });
+});
+
+$('simulateBtn')?.addEventListener('click', runSimulation);
+$('saveSimBtn')?.addEventListener('click', saveSimulation);
+$('themeToggle')?.addEventListener('click', toggleTheme);
+$('exportJson')?.addEventListener('click', exportJSON);
+$('exportCsv')?.addEventListener('click', exportCSV);
+$('exportHtml')?.addEventListener('click', exportHTML);
+$('exportCompare')?.addEventListener('click', exportComparison);
+$('btnResetSectors')?.addEventListener('click', resetSectors);
+
+$('clearBtn')?.addEventListener('click', () => {
+  state.lastResult = null;
+  state.hourlyData.clear();
+  state.events = [];
+  state.savedSimulations = [];
+  ['ivGrowth','ivVCH','ivPolyp','ivMort','ivZoo','ivHours','ivSimGrowth','ivGain'].forEach(id => { if ($(id)) $(id).textContent = '—'; });
+  $('ivStatus').textContent = '● PRÊT';
+  ['exportCsv','exportJson','exportHtml','exportCompare'].forEach(id => $(id).disabled = true);
+  $('compareBadge').style.display = 'none';
+  updateStats();
+  renderSavedSimsList();
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.view === 'overview'));
+  state.activeView = 'overview';
+  renderView();
+  toast('🗑️ Tout effacé', 'info');
+});
+
+$('burgerMenu')?.addEventListener('click', () => {
+  $('sidebar')?.classList.toggle('open');
+  $('mobileOverlay')?.classList.toggle('visible');
+});
+$('mobileOverlay')?.addEventListener('click', () => {
+  $('sidebar')?.classList.remove('open');
+  $('mobileOverlay')?.classList.remove('visible');
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+(function init(){
+  applyTheme();
+  setupDropZone();
+  updateLabels();
+  renderSectorButtons();
+  updateSectorInfo();
+  updateStats();
+  renderSavedSimsList();
+  renderView();
+  toast('🔬 Simulateur v6.0 · JSON · Comparaison · Exports', 'info', 3500);
+})();
+</script>
+</body>
+</html>
